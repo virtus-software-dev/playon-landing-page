@@ -16,3 +16,26 @@ html {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-purple {
+  background: linear-gradient(90deg, #AB7EFB 30%, #CDB4FD 50%, #AB7EFB 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2.5s linear infinite;
+}
+
+.shimmer-orange {
+  background: linear-gradient(90deg, #FBBC7E 30%, #FDD4A8 50%, #FBBC7E 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2.5s linear infinite;
+}

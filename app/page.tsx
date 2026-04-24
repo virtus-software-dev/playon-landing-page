@@ -156,6 +156,15 @@ export default function Home() {
   const [audience, setAudience] = useState<Audience>("player");
   const isPlayer = audience === "player";
 
+  // Persist and restore audience selection
+  useEffect(() => {
+    const stored = localStorage.getItem("playon-audience") as Audience | null;
+    if (stored === "player" || stored === "manager") setAudience(stored);
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("playon-audience", audience);
+  }, [audience]);
+
   const accent = isPlayer ? "#5900F8" : "#FF6F00";
   const heroBg = isPlayer ? "#040018" : "#141414";
   const tintBg = isPlayer ? "#F2EBFE" : "#FFF6F0";
@@ -236,6 +245,7 @@ export default function Home() {
                 <button onClick={() => scrollTo("quem-somos")} className="hover:text-white transition-colors">Quem Somos</button>
               </>
             )}
+            <a href="/blog" className={isPlayer ? "shimmer-purple" : "shimmer-orange"}>Blog</a>
           </div>
 
           <div className="flex items-center">
@@ -302,7 +312,7 @@ export default function Home() {
             <div>
               <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
                 Encontre. Reserve.{" "}
-                <span style={{ color: "#AB7EFB" }}>Jogue.</span>
+                <span className="shimmer-purple">Jogue.</span>
               </h1>
               <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: "#AFAFAF" }}>
                 O app para quem ama esporte. Ache quadras perto de você,
@@ -333,7 +343,7 @@ export default function Home() {
             <div>
               <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
                 Gerencie. Automatize.{" "}
-                <span style={{ color: "#FBBC7E" }}>Cresça.</span>
+                <span className="shimmer-orange">Cresça.</span>
               </h1>
               <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: "#AFAFAF" }}>
                 A plataforma completa para gestores de quadras esportivas.
