@@ -1,10 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 type Audience = "player" | "manager";
 
+/* ── Fade-in wrapper ── */
+function FadeIn({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(28px)",
+        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ── Data ── */
 const managerFeatures = [
   {
     title: "Assistente com IA",
@@ -80,6 +125,7 @@ const testimonials = [
   },
 ];
 
+/* ── Page ── */
 export default function Home() {
   const [audience, setAudience] = useState<Audience>("player");
   const isPlayer = audience === "player";
@@ -90,6 +136,10 @@ export default function Home() {
   const currentLogo = isPlayer
     ? "/logos/logo-principal-playon-app.svg"
     : "/logos/logo-principal-playon-web.svg";
+
+  function scrollTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -104,16 +154,16 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-6 text-sm" style={{ color: "#AFAFAF" }}>
             {isPlayer ? (
               <>
-                <a href="#como-funciona" className="hover:text-white transition-colors">Como Funciona</a>
-                <a href="#esportes" className="hover:text-white transition-colors">Esportes</a>
-                <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
+                <button onClick={() => scrollTo("como-funciona")} className="hover:text-white transition-colors">Como Funciona</button>
+                <button onClick={() => scrollTo("esportes")} className="hover:text-white transition-colors">Esportes</button>
+                <button onClick={() => scrollTo("depoimentos")} className="hover:text-white transition-colors">Depoimentos</button>
               </>
             ) : (
               <>
-                <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
-                <a href="#precos" className="hover:text-white transition-colors">Preços</a>
-                <a href="#documentacao" className="hover:text-white transition-colors">Documentação</a>
-                <a href="#quem-somos" className="hover:text-white transition-colors">Quem Somos</a>
+                <button onClick={() => scrollTo("funcionalidades")} className="hover:text-white transition-colors">Funcionalidades</button>
+                <button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button>
+                <button onClick={() => scrollTo("documentacao")} className="hover:text-white transition-colors">Documentação</button>
+                <button onClick={() => scrollTo("quem-somos")} className="hover:text-white transition-colors">Quem Somos</button>
               </>
             )}
           </div>
@@ -147,28 +197,32 @@ export default function Home() {
         style={{ backgroundColor: heroBg }}
       >
         <div className="max-w-6xl mx-auto px-6 py-24 text-center w-full">
-          {/* THE single audience toggle */}
+
+          {/* Sliding toggle */}
           <div
-            className="inline-flex items-center rounded-full p-1 mb-12"
+            className="relative inline-flex rounded-full p-1 mb-12"
             style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
           >
+            {/* sliding pill */}
+            <span
+              className="absolute inset-y-1 rounded-full transition-all duration-300 ease-in-out"
+              style={{
+                width: "calc(50% - 4px)",
+                left: isPlayer ? "4px" : "calc(50%)",
+                backgroundColor: isPlayer ? "#5900F8" : "#FF6F00",
+              }}
+            />
             <button
               onClick={() => setAudience("player")}
-              className="px-6 py-2 rounded-full text-sm font-semibold transition-all"
-              style={{
-                backgroundColor: isPlayer ? "#5900F8" : "transparent",
-                color: isPlayer ? "#FFFFFF" : "#AFAFAF",
-              }}
+              className="relative z-10 w-28 py-2 text-sm font-semibold transition-colors duration-200"
+              style={{ color: isPlayer ? "#FFFFFF" : "#AFAFAF" }}
             >
               Sou Jogador
             </button>
             <button
               onClick={() => setAudience("manager")}
-              className="px-6 py-2 rounded-full text-sm font-semibold transition-all"
-              style={{
-                backgroundColor: !isPlayer ? "#FF6F00" : "transparent",
-                color: !isPlayer ? "#FFFFFF" : "#AFAFAF",
-              }}
+              className="relative z-10 w-28 py-2 text-sm font-semibold transition-colors duration-200"
+              style={{ color: !isPlayer ? "#FFFFFF" : "#AFAFAF" }}
             >
               Sou Gestor
             </button>
@@ -233,21 +287,28 @@ export default function Home() {
           {/* Como Funciona */}
           <section id="como-funciona" className="bg-white py-24">
             <div className="max-w-6xl mx-auto px-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
-                Como funciona
-              </h2>
-              <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
-                Do download à quadra em menos de 2 minutos.
-              </p>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
+                  Como funciona
+                </h2>
+                <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
+                  Do download à quadra em menos de 2 minutos.
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {howItWorks.map((s) => (
-                  <div key={s.step} className="flex flex-col items-center text-center p-8 rounded-2xl" style={{ backgroundColor: "#F2EBFE" }}>
-                    <span className="text-5xl font-extrabold mb-4" style={{ color: "#5900F8" }}>
-                      {s.step}
-                    </span>
-                    <h3 className="text-xl font-bold mb-2" style={{ color: "#141414" }}>{s.title}</h3>
-                    <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{s.desc}</p>
-                  </div>
+                {howItWorks.map((s, i) => (
+                  <FadeIn key={s.step} delay={i * 120}>
+                    <div
+                      className="flex flex-col items-center text-center p-8 rounded-2xl h-full"
+                      style={{ backgroundColor: "#F2EBFE" }}
+                    >
+                      <span className="text-5xl font-extrabold mb-4" style={{ color: "#5900F8" }}>
+                        {s.step}
+                      </span>
+                      <h3 className="text-xl font-bold mb-2" style={{ color: "#141414" }}>{s.title}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{s.desc}</p>
+                    </div>
+                  </FadeIn>
                 ))}
               </div>
             </div>
@@ -256,56 +317,71 @@ export default function Home() {
           {/* Esportes */}
           <section id="esportes" className="py-24" style={{ backgroundColor: "#040018" }}>
             <div className="max-w-6xl mx-auto px-6 text-center">
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-                100+ esportes para encontrar no app
-              </h2>
-              <p className="text-lg mb-12" style={{ color: "#AFAFAF" }}>
-                De beach tennis a futsal. Se tem quadra, tem no PlayOn.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                {sports.map((sport) => (
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                  100+ esportes para encontrar no app
+                </h2>
+                <p className="text-lg mb-12" style={{ color: "#AFAFAF" }}>
+                  De beach tennis a futsal. Se tem quadra, tem no PlayOn.
+                </p>
+              </FadeIn>
+              <FadeIn delay={150}>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {sports.map((sport) => (
+                    <span
+                      key={sport}
+                      className="px-5 py-2 rounded-full text-sm font-medium"
+                      style={{
+                        backgroundColor: "rgba(89,0,248,0.2)",
+                        color: "#AB7EFB",
+                        border: "1px solid rgba(171,126,251,0.3)",
+                      }}
+                    >
+                      {sport}
+                    </span>
+                  ))}
                   <span
-                    key={sport}
                     className="px-5 py-2 rounded-full text-sm font-medium"
-                    style={{ backgroundColor: "rgba(89,0,248,0.2)", color: "#AB7EFB", border: "1px solid rgba(171,126,251,0.3)" }}
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.06)",
+                      color: "#737373",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                    }}
                   >
-                    {sport}
+                    e muito mais...
                   </span>
-                ))}
-                <span
-                  className="px-5 py-2 rounded-full text-sm font-medium"
-                  style={{ backgroundColor: "rgba(255,255,255,0.06)", color: "#737373", border: "1px solid rgba(255,255,255,0.1)" }}
-                >
-                  e muito mais...
-                </span>
-              </div>
+                </div>
+              </FadeIn>
             </div>
           </section>
 
           {/* Depoimentos */}
           <section id="depoimentos" className="bg-white py-24">
             <div className="max-w-6xl mx-auto px-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
-                Quem joga, aprova
-              </h2>
-              <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
-                Jogadores de todo o Brasil já estão no PlayOn.
-              </p>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
+                  Quem joga, aprova
+                </h2>
+                <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
+                  Jogadores de todo o Brasil já estão no PlayOn.
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {testimonials.map((t) => (
-                  <div
-                    key={t.name}
-                    className="p-8 rounded-2xl flex flex-col gap-4"
-                    style={{ backgroundColor: "#F2EBFE" }}
-                  >
-                    <p className="text-sm leading-relaxed flex-1" style={{ color: "#4E4E4E" }}>
-                      "{t.quote}"
-                    </p>
-                    <div>
-                      <div className="font-semibold text-sm" style={{ color: "#141414" }}>{t.name}</div>
-                      <div className="text-xs" style={{ color: "#AB7EFB" }}>{t.sport}</div>
+                {testimonials.map((t, i) => (
+                  <FadeIn key={t.name} delay={i * 120}>
+                    <div
+                      className="p-8 rounded-2xl flex flex-col gap-4 h-full"
+                      style={{ backgroundColor: "#F2EBFE" }}
+                    >
+                      <p className="text-sm leading-relaxed flex-1" style={{ color: "#4E4E4E" }}>
+                        "{t.quote}"
+                      </p>
+                      <div>
+                        <div className="font-semibold text-sm" style={{ color: "#141414" }}>{t.name}</div>
+                        <div className="text-xs" style={{ color: "#AB7EFB" }}>{t.sport}</div>
+                      </div>
                     </div>
-                  </div>
+                  </FadeIn>
                 ))}
               </div>
             </div>
@@ -314,26 +390,32 @@ export default function Home() {
           {/* Player Final CTA */}
           <section className="py-24 text-center" style={{ backgroundColor: "#040018" }}>
             <div className="max-w-2xl mx-auto px-6">
-              <h2 className="text-4xl font-extrabold text-white mb-4">Pronto para jogar?</h2>
-              <p className="mb-8 text-lg" style={{ color: "#AFAFAF" }}>
-                Baixe o app e faça sua primeira reserva grátis.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="#"
-                  className="font-semibold px-8 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: "#5900F8", color: "#FFFFFF" }}
-                >
-                  App Store
-                </a>
-                <a
-                  href="#"
-                  className="font-semibold px-8 py-4 rounded-full text-lg border transition-colors"
-                  style={{ backgroundColor: "rgba(255,255,255,0.08)", color: "#FFFFFF", borderColor: "rgba(255,255,255,0.2)" }}
-                >
-                  Google Play
-                </a>
-              </div>
+              <FadeIn>
+                <h2 className="text-4xl font-extrabold text-white mb-4">Pronto para jogar?</h2>
+                <p className="mb-8 text-lg" style={{ color: "#AFAFAF" }}>
+                  Baixe o app e faça sua primeira reserva grátis.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href="#"
+                    className="font-semibold px-8 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#5900F8", color: "#FFFFFF" }}
+                  >
+                    App Store
+                  </a>
+                  <a
+                    href="#"
+                    className="font-semibold px-8 py-4 rounded-full text-lg border transition-colors"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.08)",
+                      color: "#FFFFFF",
+                      borderColor: "rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    Google Play
+                  </a>
+                </div>
+              </FadeIn>
             </div>
           </section>
         </>
@@ -345,59 +427,68 @@ export default function Home() {
           {/* Social Proof */}
           <section className="bg-white py-20">
             <div className="max-w-6xl mx-auto px-6">
-              <p className="text-center text-sm font-semibold uppercase tracking-widest mb-12" style={{ color: "#AFAFAF" }}>
-                Quem adotou o PlayOn já sente a diferença
-              </p>
+              <FadeIn>
+                <p className="text-center text-sm font-semibold uppercase tracking-widest mb-12" style={{ color: "#AFAFAF" }}>
+                  Quem adotou o PlayOn já sente a diferença
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-                {metrics.map((m) => (
-                  <div key={m.label} className="text-center">
-                    <div className="text-4xl font-extrabold" style={{ color: "#FF6F00" }}>{m.value}</div>
-                    <div className="text-sm mt-2" style={{ color: "#737373" }}>{m.label}</div>
-                  </div>
+                {metrics.map((m, i) => (
+                  <FadeIn key={m.label} delay={i * 100}>
+                    <div className="text-center">
+                      <div className="text-4xl font-extrabold" style={{ color: "#FF6F00" }}>{m.value}</div>
+                      <div className="text-sm mt-2" style={{ color: "#737373" }}>{m.label}</div>
+                    </div>
+                  </FadeIn>
                 ))}
               </div>
-              <div
-                className="rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6"
-                style={{ backgroundColor: "#FFF6F0" }}
-              >
-                <div>
-                  <h3 className="text-xl font-bold mb-1" style={{ color: "#141414" }}>
-                    Suporte que não te deixa na mão
-                  </h3>
-                  <p style={{ color: "#737373" }}>
-                    Time disponível para ajudar você a crescer. Do onboarding ao dia a dia.
-                  </p>
-                </div>
-                <a
-                  href="mailto:suporte@playon.app.br"
-                  className="whitespace-nowrap font-semibold px-6 py-3 rounded-full transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: "#FF6F00", color: "#FFFFFF" }}
+              <FadeIn delay={200}>
+                <div
+                  className="rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6"
+                  style={{ backgroundColor: "#FFF6F0" }}
                 >
-                  Falar com suporte
-                </a>
-              </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1" style={{ color: "#141414" }}>
+                      Suporte que não te deixa na mão
+                    </h3>
+                    <p style={{ color: "#737373" }}>
+                      Time disponível para ajudar você a crescer. Do onboarding ao dia a dia.
+                    </p>
+                  </div>
+                  <a
+                    href="mailto:suporte@playon.app.br"
+                    className="whitespace-nowrap font-semibold px-6 py-3 rounded-full transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#FF6F00", color: "#FFFFFF" }}
+                  >
+                    Falar com suporte
+                  </a>
+                </div>
+              </FadeIn>
             </div>
           </section>
 
           {/* Features */}
           <section id="funcionalidades" className="py-24" style={{ backgroundColor: "#FFF6F0" }}>
             <div className="max-w-6xl mx-auto px-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#FF6F00" }}>
-                Tudo que você precisa para gerir
-              </h2>
-              <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
-                Tecnologia que trabalha por você enquanto você foca no que importa.
-              </p>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#FF6F00" }}>
+                  Tudo que você precisa para gerir
+                </h2>
+                <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
+                  Tecnologia que trabalha por você enquanto você foca no que importa.
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {managerFeatures.map((f) => (
-                  <div
-                    key={f.title}
-                    className="p-6 rounded-2xl bg-white border"
-                    style={{ borderColor: "#FFF6F0" }}
-                  >
-                    <h3 className="font-semibold mb-2" style={{ color: "#141414" }}>{f.title}</h3>
-                    <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{f.desc}</p>
-                  </div>
+                {managerFeatures.map((f, i) => (
+                  <FadeIn key={f.title} delay={i * 100}>
+                    <div
+                      className="p-6 rounded-2xl bg-white border h-full"
+                      style={{ borderColor: "#FFF6F0" }}
+                    >
+                      <h3 className="font-semibold mb-2" style={{ color: "#141414" }}>{f.title}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{f.desc}</p>
+                    </div>
+                  </FadeIn>
                 ))}
               </div>
             </div>
@@ -406,54 +497,56 @@ export default function Home() {
           {/* Pricing */}
           <section id="precos" className="bg-white py-24">
             <div className="max-w-6xl mx-auto px-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
-                Preços e Planos
-              </h2>
-              <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
-                Transparente, simples e sem surpresas.
-              </p>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
+                  Preços e Planos
+                </h2>
+                <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
+                  Transparente, simples e sem surpresas.
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-
-                {/* Manager — Basic */}
-                <div className="rounded-2xl p-8 flex flex-col" style={{ backgroundColor: "#FF6F00" }}>
-                  <div className="text-xs font-semibold uppercase tracking-widest mb-4 text-white/70">
-                    Gestor — Básico
+                <FadeIn delay={100}>
+                  <div className="rounded-2xl p-8 flex flex-col h-full" style={{ backgroundColor: "#FF6F00" }}>
+                    <div className="text-xs font-semibold uppercase tracking-widest mb-4 text-white/70">
+                      Gestor — Básico
+                    </div>
+                    <div className="text-5xl font-extrabold mb-1 text-white">R$149,90</div>
+                    <p className="text-sm mb-1 text-white/70">por mês</p>
+                    <p className="text-sm mb-8 text-white/70">ou R$1.500/ano — 2 meses grátis</p>
+                    <ul className="flex flex-col gap-3 mb-8 flex-1 text-sm text-white/90">
+                      <li>✓ Gestão completa de reservas</li>
+                      <li>✓ Pagamentos online</li>
+                      <li>✓ Assistente com IA</li>
+                      <li>✓ Métricas e relatórios</li>
+                      <li>✓ Suporte prioritário</li>
+                    </ul>
+                    <a
+                      href="https://gestor.playon.app.br"
+                      className="text-center font-semibold px-6 py-3 rounded-full bg-white transition-opacity hover:opacity-90"
+                      style={{ color: "#FF6F00" }}
+                    >
+                      Começar grátis
+                    </a>
                   </div>
-                  <div className="text-5xl font-extrabold mb-1 text-white">R$149,90</div>
-                  <p className="text-sm mb-1 text-white/70">por mês</p>
-                  <p className="text-sm mb-8 text-white/70">ou R$1.500/ano — 2 meses grátis</p>
-                  <ul className="flex flex-col gap-3 mb-8 flex-1 text-sm text-white/90">
-                    <li>✓ Gestão completa de reservas</li>
-                    <li>✓ Pagamentos online</li>
-                    <li>✓ Assistente com IA</li>
-                    <li>✓ Métricas e relatórios</li>
-                    <li>✓ Suporte prioritário</li>
-                  </ul>
-                  <a
-                    href="https://gestor.playon.app.br"
-                    className="text-center font-semibold px-6 py-3 rounded-full bg-white transition-opacity hover:opacity-90"
-                    style={{ color: "#FF6F00" }}
-                  >
-                    Começar grátis
-                  </a>
-                </div>
-
-                {/* Manager — Avançado (coming soon) */}
-                <div
-                  className="rounded-2xl border p-8 flex flex-col items-center justify-center text-center"
-                  style={{ borderColor: "#E0E0E0", borderStyle: "dashed", opacity: 0.65 }}
-                >
+                </FadeIn>
+                <FadeIn delay={200}>
                   <div
-                    className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6"
-                    style={{ backgroundColor: "#FFF6F0", color: "#FF6F00" }}
+                    className="rounded-2xl border p-8 flex flex-col items-center justify-center text-center h-full"
+                    style={{ borderColor: "#E0E0E0", borderStyle: "dashed", opacity: 0.65 }}
                   >
-                    Em breve
+                    <div
+                      className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6"
+                      style={{ backgroundColor: "#FFF6F0", color: "#FF6F00" }}
+                    >
+                      Em breve
+                    </div>
+                    <h3 className="text-xl font-bold mb-3" style={{ color: "#141414" }}>Gestor — Avançado</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>
+                      Muito mais, por menos!
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold mb-3" style={{ color: "#141414" }}>Gestor — Avançado</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>
-                    Muito mais, por menos!
-                  </p>
-                </div>
+                </FadeIn>
               </div>
             </div>
           </section>
@@ -461,28 +554,31 @@ export default function Home() {
           {/* Documentation */}
           <section id="documentacao" className="py-24" style={{ backgroundColor: "#F6F6F6" }}>
             <div className="max-w-6xl mx-auto px-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
-                Documentação
-              </h2>
-              <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
-                Tudo que você precisa para integrar e usar o PlayOn ao máximo.
-              </p>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: "#141414" }}>
+                  Documentação
+                </h2>
+                <p className="text-center mb-16 text-lg" style={{ color: "#737373" }}>
+                  Tudo que você precisa para integrar e usar o PlayOn ao máximo.
+                </p>
+              </FadeIn>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {docsCards.map((d) => (
-                  <div
-                    key={d.title}
-                    className="bg-white rounded-2xl p-6 border relative overflow-hidden cursor-not-allowed"
-                    style={{ borderColor: "#E0E0E0" }}
-                  >
-                    <span
-                      className="absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: "#F6F6F6", color: "#AFAFAF" }}
+                {docsCards.map((d, i) => (
+                  <FadeIn key={d.title} delay={i * 100}>
+                    <div
+                      className="bg-white rounded-2xl p-6 border relative overflow-hidden cursor-not-allowed h-full"
+                      style={{ borderColor: "#E0E0E0" }}
                     >
-                      Em breve
-                    </span>
-                    <h3 className="font-semibold mb-2" style={{ color: "#141414" }}>{d.title}</h3>
-                    <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{d.desc}</p>
-                  </div>
+                      <span
+                        className="absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: "#F6F6F6", color: "#AFAFAF" }}
+                      >
+                        Em breve
+                      </span>
+                      <h3 className="font-semibold mb-2" style={{ color: "#141414" }}>{d.title}</h3>
+                      <p className="text-sm leading-relaxed" style={{ color: "#737373" }}>{d.desc}</p>
+                    </div>
+                  </FadeIn>
                 ))}
               </div>
             </div>
@@ -491,41 +587,45 @@ export default function Home() {
           {/* Quem Somos */}
           <section id="quem-somos" className="bg-white py-24">
             <div className="max-w-3xl mx-auto px-6 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: "#141414" }}>
-                Quem somos
-              </h2>
-              <p className="text-lg leading-relaxed mb-10" style={{ color: "#737373" }}>
-                Somos a <strong style={{ color: "#141414" }}>Virtus Software</strong>, uma empresa
-                apaixonada por tecnologia e esporte. O PlayOn nasceu da vontade de conectar jogadores
-                e simplificar a gestão de quadras esportivas no Brasil. Acreditamos que tecnologia
-                bem feita transforma negócios — e a experiência de quem joga.
-              </p>
-              <a
-                href="https://virtus.dev.br"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block font-semibold px-8 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#141414", color: "#FFFFFF" }}
-              >
-                Conheça a Virtus →
-              </a>
+              <FadeIn>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: "#141414" }}>
+                  Quem somos
+                </h2>
+                <p className="text-lg leading-relaxed mb-10" style={{ color: "#737373" }}>
+                  Somos a <strong style={{ color: "#141414" }}>Virtus Software</strong>, uma empresa
+                  apaixonada por tecnologia e esporte. O PlayOn nasceu da vontade de conectar jogadores
+                  e simplificar a gestão de quadras esportivas no Brasil. Acreditamos que tecnologia
+                  bem feita transforma negócios — e a experiência de quem joga.
+                </p>
+                <a
+                  href="https://virtus.dev.br"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block font-semibold px-8 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: "#141414", color: "#FFFFFF" }}
+                >
+                  Conheça a Virtus →
+                </a>
+              </FadeIn>
             </div>
           </section>
 
           {/* Manager Final CTA */}
           <section className="py-24 text-center" style={{ backgroundColor: "#141414" }}>
             <div className="max-w-2xl mx-auto px-6">
-              <h2 className="text-4xl font-extrabold text-white mb-4">Comece hoje mesmo</h2>
-              <p className="mb-8 text-lg" style={{ color: "#AFAFAF" }}>
-                Crie sua conta gratuitamente e comece a receber reservas ainda hoje.
-              </p>
-              <a
-                href="https://gestor.playon.app.br"
-                className="inline-block font-semibold px-10 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#FF6F00", color: "#FFFFFF" }}
-              >
-                Criar conta grátis →
-              </a>
+              <FadeIn>
+                <h2 className="text-4xl font-extrabold text-white mb-4">Comece hoje mesmo</h2>
+                <p className="mb-8 text-lg" style={{ color: "#AFAFAF" }}>
+                  Crie sua conta gratuitamente e comece a receber reservas ainda hoje.
+                </p>
+                <a
+                  href="https://gestor.playon.app.br"
+                  className="inline-block font-semibold px-10 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: "#FF6F00", color: "#FFFFFF" }}
+                >
+                  Criar conta grátis →
+                </a>
+              </FadeIn>
             </div>
           </section>
         </>
@@ -539,16 +639,16 @@ export default function Home() {
             <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: "#737373" }}>
               {isPlayer ? (
                 <>
-                  <a href="#como-funciona" className="hover:text-white transition-colors">Como Funciona</a>
-                  <a href="#esportes" className="hover:text-white transition-colors">Esportes</a>
-                  <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
+                  <button onClick={() => scrollTo("como-funciona")} className="hover:text-white transition-colors">Como Funciona</button>
+                  <button onClick={() => scrollTo("esportes")} className="hover:text-white transition-colors">Esportes</button>
+                  <button onClick={() => scrollTo("depoimentos")} className="hover:text-white transition-colors">Depoimentos</button>
                 </>
               ) : (
                 <>
-                  <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
-                  <a href="#precos" className="hover:text-white transition-colors">Preços</a>
-                  <a href="#documentacao" className="hover:text-white transition-colors">Documentação</a>
-                  <a href="#quem-somos" className="hover:text-white transition-colors">Quem Somos</a>
+                  <button onClick={() => scrollTo("funcionalidades")} className="hover:text-white transition-colors">Funcionalidades</button>
+                  <button onClick={() => scrollTo("precos")} className="hover:text-white transition-colors">Preços</button>
+                  <button onClick={() => scrollTo("documentacao")} className="hover:text-white transition-colors">Documentação</button>
+                  <button onClick={() => scrollTo("quem-somos")} className="hover:text-white transition-colors">Quem Somos</button>
                 </>
               )}
             </div>
