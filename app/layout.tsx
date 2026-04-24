@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PlayOn",
-  description: "PlayOn landing page",
+  title: "PlayOn — Reserve sua quadra",
+  description: "O app para quem ama esporte. Encontre e reserve quadras perto de você.",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="pt-BR" className="h-full">
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
