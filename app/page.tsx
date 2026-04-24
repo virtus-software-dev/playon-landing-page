@@ -167,14 +167,12 @@ export default function Home() {
     : "/logos/logo-playon-simplificada-web.svg";
 
   useEffect(() => {
-    const favicon = isPlayer ? "/favicon-mobile.ico" : "/favicon-web.ico";
-    let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
-    if (!link) {
-      link = document.createElement("link");
-      link.rel = "icon";
-      document.head.appendChild(link);
-    }
-    link.href = favicon;
+    document.querySelectorAll("link[rel~='icon']").forEach((el) => el.remove());
+    const link = document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = isPlayer ? "/favicon-mobile.ico" : "/favicon-web.ico";
+    document.head.appendChild(link);
   }, [isPlayer]);
 
   function scrollTo(id: string) {
@@ -711,7 +709,7 @@ export default function Home() {
                 </a>
               </FadeIn>
               <div className="flex-1 flex justify-center items-end">
-                <Image src="/maos-negocio.png" alt="" width={480} height={400} className="object-contain" />
+                <Image src="/image-CTA.png" alt="" width={540} height={500} className="object-contain" />
               </div>
             </div>
           </section>
