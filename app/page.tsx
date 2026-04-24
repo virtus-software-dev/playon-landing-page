@@ -419,7 +419,7 @@ export default function Home() {
                   <div className="text-xs font-semibold uppercase tracking-widest mb-4 text-white/70">
                     Gestor — Básico
                   </div>
-                  <div className="text-5xl font-extrabold mb-1 text-white">R$150</div>
+                  <div className="text-5xl font-extrabold mb-1 text-white">R$149,90</div>
                   <p className="text-sm mb-1 text-white/70">por mês</p>
                   <p className="text-sm mb-8 text-white/70">ou R$1.500/ano — 2 meses grátis</p>
                   <ul className="flex flex-col gap-3 mb-8 flex-1 text-sm text-white/90">
