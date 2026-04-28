@@ -764,8 +764,7 @@ export default function Home() {
               className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <span className="text-sm" style={{ color: "#737373" }}>by</span>
-              {/*<Image src="/logos/logo-virtus-simplificada.svg" alt="Virtus Software" width={40} height={20} />*/}
-              <Image src="/logos/logo-principal-virtus.svg" alt="Virtus Software" width={40} height={20} />
+              <Image src="/logos/logo-virtus-simplificada.svg" alt="Virtus Software" width={40} height={20} />
             </a>
           </div>
         </div>
