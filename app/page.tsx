@@ -351,10 +351,9 @@ export default function Home() {
               </p>
               <a
                 href="https://gestor.playon.app.br"
-                className="inline-block font-semibold px-10 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#FF6F00", color: "#FFFFFF" }}
+                className="inline-block font-semibold px-10 py-4 rounded-full text-lg btn-liquid-orange"
               >
-                Começar grátis →
+                <span>Começar grátis →</span>
               </a>
             </div>
           )}
@@ -712,10 +711,9 @@ export default function Home() {
                 </p>
                 <a
                   href="https://gestor.playon.app.br"
-                  className="inline-flex items-center gap-2 font-semibold px-8 py-4 rounded-full text-base border-2 transition-all hover:bg-black/10"
-                  style={{ borderColor: "#141414", color: "#141414" }}
+                  className="inline-flex font-semibold px-8 py-4 rounded-full text-base btn-liquid-dark"
                 >
-                  Vai, clica nesse botão →
+                  <span>Vai, clica nesse botão →</span>
                 </a>
               </FadeIn>
               <div className="flex-1 flex justify-center items-end">
@@ -766,7 +764,8 @@ export default function Home() {
               className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <span className="text-sm" style={{ color: "#737373" }}>by</span>
-              <Image src="/logos/logo-virtus-simplificada.svg" alt="Virtus Software" width={40} height={20} />
+              {/*<Image src="/logos/logo-virtus-simplificada.svg" alt="Virtus Software" width={40} height={20} />*/}
+              <Image src="/logos/logo-principal-virtus.svg" alt="Virtus Software" width={40} height={20} />
             </a>
           </div>
         </div>

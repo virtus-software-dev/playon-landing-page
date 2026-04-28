@@ -17,6 +17,51 @@ html {
   animation-play-state: paused;
 }
 
+/* Liquid fill buttons */
+.btn-liquid-orange {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #FF6F00;
+  color: #FF6F00;
+  background: transparent;
+  transition: color 0.45s ease;
+}
+.btn-liquid-orange::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #FF6F00;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+.btn-liquid-orange:hover::before { transform: scaleX(1); }
+.btn-liquid-orange:hover { color: #FFFFFF; }
+.btn-liquid-orange > span { position: relative; z-index: 1; }
+
+.btn-liquid-dark {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #141414;
+  color: #141414;
+  background: transparent;
+  transition: color 0.45s ease;
+}
+.btn-liquid-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #141414;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+.btn-liquid-dark:hover::before { transform: scaleX(1); }
+.btn-liquid-dark:hover { color: #FFFFFF; }
+.btn-liquid-dark > span { position: relative; z-index: 1; }
+
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
